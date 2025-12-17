@@ -6,13 +6,14 @@ from utils.security import hash_password
 """ Модуль для CRUD над таблицею користувачів """
 
 def create_user(db: Session, user: us.RegisterUser):
-    """ Реєстрація нового користувача з хешуванням пароля. """
+    """ Реєстрація нового користувача з хешуванням пароля """
 
     # Створюємо об'єкт моделі, перетворюючи типи Pydantic у типи SQLAlchemy
     new_user = Users(
         full_name = user.full_name,
         email = str(user.email),
-        password_hash = hash_password(user.password) #
+        password_hash = hash_password(user.password),
+        role = user.role
     )
 
     try:

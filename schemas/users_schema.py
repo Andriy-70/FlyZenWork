@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional
+from typing import Optional, Literal
 
 """
 Схеми валідації даних користувача
@@ -13,6 +13,7 @@ class RegisterUser(BaseModel):
     full_name: str
     email: EmailStr
     password: str = Field(..., min_length=8)
+    role: Literal['admin', 'user'] = 'user'
 
 #схеми для jwt
 class Token(BaseModel):
