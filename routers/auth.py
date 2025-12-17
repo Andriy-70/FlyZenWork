@@ -13,9 +13,7 @@ router = APIRouter(
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 def register_user(user_data: us.RegisterUser, db: Session = Depends(get_db)):
-    """
-    Ендпоінт для реєстрації нового користувача.
-    """
+    """ Ендпоінт для реєстрації нового користувача """
 
     #перевірка на дубліка email
     existing_user = db.query(Users).filter(Users.email == user_data.email).first()

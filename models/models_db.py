@@ -30,7 +30,7 @@ class Users(Base):
 class Projects(Base):
     __tablename__ = "projects"
 
-    project_id = Column(Integer, primary_key=True)
+    id_project = Column(Integer, primary_key=True)
     title = Column(String(100), nullable=False)
     description= Column(Text, nullable=False)
     status = Column(Enum(ProjectStatus), server_default="active", nullable=False)
