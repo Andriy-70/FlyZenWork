@@ -11,7 +11,7 @@ router = APIRouter(
     tags=["CRUD project"],
 )
 
-@router.post("/project", status_code=status.HTTP_201_CREATED)
+@router.post("/create", status_code=status.HTTP_201_CREATED)
 def create_project(project: CreateProject, db: Session = Depends(get_db)):
 
     # чи існує вже такий проект у данного користувача
@@ -27,3 +27,16 @@ def create_project(project: CreateProject, db: Session = Depends(get_db)):
         )
 
     return create_projects(db, project)
+
+@router.get("/{id}", status_code=status.HTTP_200_OK)
+def read_project(project_id: int, db: Session = Depends(get_db)):
+
+    project = get_project(db, project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Проєкт не найдено")
+
+    return project
+
+@router.delete("/delete", status_code=status.HTTP_200_OK)
+def delete_project():
+    ...

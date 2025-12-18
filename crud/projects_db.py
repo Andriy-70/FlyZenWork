@@ -23,8 +23,9 @@ def create_projects(db: Session, project: ps.CreateProject) -> Projects:
         db.rollback()
         raise e
 
-def get_project(db: Session, project_id: int):
-    return db.query(Projects).filter(Projects.project_id == project_id).first()
+
+def get_project(db: Session, id_project: int):
+    return db.query(Projects).filter(Projects.id_project == id_project).first()
 
 def delete_projects(db: Session, project):
 
@@ -34,3 +35,5 @@ def delete_projects(db: Session, project):
     except Exception as e:
         db.rollback()
         raise e
+
+
