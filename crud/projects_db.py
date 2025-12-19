@@ -4,14 +4,14 @@ from schemas import projects_schema as ps
 
 """ crud для projects"""
 
-def create_projects(db: Session, project: ps.CreateProject) -> Projects:
+def create_projects(db: Session, project: ps.CreateProject, owner_id: int) -> Projects:
     """ ств проєкт"""
 
     new_project = Projects(
         title = project.title,
         description = project.description,
         status = project.status,
-        owner_id = project.owner_id
+        owner_id = owner_id
     )
 
     try:
@@ -24,12 +24,17 @@ def create_projects(db: Session, project: ps.CreateProject) -> Projects:
         raise e
 
 
-def get_project(db: Session, id_project: int):
-    return db.query(Projects).filter(Projects.id_project == id_project).first()
+def get_project(db: Session, id_project: int, owner_id: int):
+    return db.query(Projects).filter(Projects.id_project == id_project,
+                                      Projects.owner_id == owner_id).first()
 
-def delete_projects(db: Session, project):
+def delete_projects(db: Session, id_project: int, owner_id: int):
 
     try:
+        project = get_project(db, id_project, owner_id)
+        if not project:
+            return False
+
         db.delete(project)
         db.commit()
     except Exception as e:

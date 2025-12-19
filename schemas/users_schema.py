@@ -5,10 +5,6 @@ from typing import Optional, Literal
 Схеми валідації даних користувача
 """
 
-class LoginUser(BaseModel):
-    email: EmailStr
-    password: str = Field(..., min_length=8)
-
 class RegisterUser(BaseModel):
     full_name: str
     email: EmailStr
