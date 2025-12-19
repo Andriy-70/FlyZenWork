@@ -28,6 +28,7 @@ def get_project(db: Session, id_project: int, owner_id: int):
     return db.query(Projects).filter(Projects.id_project == id_project,
                                       Projects.owner_id == owner_id).first()
 
+
 def delete_projects(db: Session, id_project: int, owner_id: int):
 
     try:
@@ -42,3 +43,24 @@ def delete_projects(db: Session, id_project: int, owner_id: int):
         raise e
 
 
+def update_projects(db: Session, id_project: int, owner_id: int, update_data: ps.UpdateProject):
+
+    try:
+        project = get_project(db, id_project, owner_id)
+        if not project:
+            return False
+
+        # беремо тільки ті поля які поміняли
+        update_project = update_data.model_dump(exclude_unset=True)
+
+        # оновлюємо проєкт
+        for key,value in update_project.items():
+            setattr(project, key, value)
+
+        db.commit()
+        db.refresh(project) # оновили в бд
+
+        return project
+    except Exception as e:
+        db.rollback()
+        raise e

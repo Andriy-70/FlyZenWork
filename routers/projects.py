@@ -2,10 +2,10 @@ from fastapi import APIRouter,Depends,HTTPException,status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from crud.database  import get_db
-from crud.projects_db import create_projects, get_project, delete_projects
+from crud.projects_db import create_projects, get_project, delete_projects, update_projects
 from utils.security import get_current_user
 from models.models_db import Projects, Users
-from schemas.projects_schema import CreateProject
+from schemas.projects_schema import CreateProject, UpdateProject
 
 router = APIRouter(
     prefix="/projects",
@@ -39,7 +39,10 @@ def read_project(project_id: int,
 
     project = get_project(db, project_id, current_user.id)
     if not project:
-        raise HTTPException(status_code=404, detail="Проєкт не найдено")
+        raise HTTPException(
+            status_code=404,
+            detail="Проєкт не найдено"
+        )
 
     return project
 
@@ -50,6 +53,25 @@ def delete_project(project_id: int,
 
     delete_status = delete_projects(db, project_id, current_user.id)
     if not delete_status:
-        raise HTTPException(status_code=404, detail="Проєкт не вдалось видалити")
+        raise HTTPException(
+            status_code=404,
+            detail="Проєкт не вдалось видалити"
+        )
 
     return None
+
+@router.patch("/{project_id}", status_code=status.HTTP_200_OK)
+def update_project(project_id: int,
+                    update_prj: UpdateProject,
+                    db: Session = Depends(get_db),
+                    current_user: Users = Depends(get_current_user)):
+
+    project = update_projects(db, project_id, current_user.id, update_prj)
+
+    if not project:
+        raise HTTPException(
+            status_code=404,
+            detail="Проєкт не вдалось змінити"
+        )
+
+    return project
