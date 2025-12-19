@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from models.models_db import Projects
+from fastapi import HTTPException
 from schemas import projects_schema as ps
 
 """ crud для projects"""
@@ -17,7 +19,7 @@ def create_projects(db: Session, project: ps.CreateProject, owner_id: int) -> Pr
     try:
         db.add(new_project)
         db.commit()
-        db.refresh(new_project) # оновлюємо об'єк щоб отримати id...
+        db.refresh(new_project) # оновлюємо об'єк щоб отримати id
         return new_project
     except Exception as e:
         db.rollback()
@@ -42,16 +44,32 @@ def delete_projects(db: Session, id_project: int, owner_id: int):
         db.rollback()
         raise e
 
+def check_project(db: Session, owner_id: int, prj_title: str):
+    """ якщо є вже такий проект повертаємо його"""
+    return db.query(Projects).filter(Projects.owner_id == owner_id,
+                                        func.lower(Projects.title) == func.lower(prj_title)).first()
+
+
 
 def update_projects(db: Session, id_project: int, owner_id: int, update_data: ps.UpdateProject):
 
-    try:
-        project = get_project(db, id_project, owner_id)
-        if not project:
-            return False
+    project = get_project(db, id_project, owner_id)
+    if not project:
+        return False
 
-        # беремо тільки ті поля які поміняли
-        update_project = update_data.model_dump(exclude_unset=True)
+    # беремо тільки ті поля які поміняли
+    update_project = update_data.model_dump(exclude_unset=True)
+
+    title = update_project.get("title")  # дістаємо назву
+
+    if title:
+        prj = check_project(db, owner_id, title)  # пошук проекту
+
+        # якщо є проєкт з такою назвою вже
+        if prj and prj.id_project != id_project:
+            raise HTTPException(status_code=400, detail="Проєкт з такою назвою вже існує")
+
+    try:
 
         # оновлюємо проєкт
         for key,value in update_project.items():
