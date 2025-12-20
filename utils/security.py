@@ -45,6 +45,7 @@ def create_access_token(data: dict):
 #отримуємо юзера
 def get_current_user(token: str = Depends(OAUTH2_SCHEME),
                      db: Session = Depends(get_db)):
+
     credentials_exception = HTTPException(
         status_code=401,
         detail="Не знайдено користувача"
