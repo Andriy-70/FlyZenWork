@@ -15,7 +15,7 @@ class ProjectStatus(str, enum.Enum):
     closed = "closed"
     completed = "completed"
 
-
+# опис таблиць
 class Users(Base):
     __tablename__ = "users"
 
