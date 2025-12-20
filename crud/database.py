@@ -14,6 +14,7 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base() # модель для бд
 
+
 def get_db():
     """ конект до базиданих"""
     db = SessionLocal()
