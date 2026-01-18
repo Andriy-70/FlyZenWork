@@ -6,6 +6,7 @@ from models.models_db import Users
 from utils.security import verify_password, create_access_token
 from schemas import users_schema as us
 from crud import users_db as crud
+from utils.security import get_current_user
 
 router = APIRouter(
     prefix="/auth",
@@ -41,3 +42,8 @@ def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = D
     # створення токена
     access_token = create_access_token(data={"user_id": user.id})
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.get("/me", response_model=us.UserResponse)
+def read_users_me(current_user: Users = Depends(get_current_user)):
+    return current_user

@@ -11,6 +11,13 @@ class RegisterUser(BaseModel):
     password: str = Field(..., min_length=8)
     role: Literal['admin', 'user'] = 'user'
 
+class UserResponse(BaseModel):
+    id: int
+    full_name: str
+    email: EmailStr
+    role: str
+    is_active: bool
+
 #схеми для jwt
 class Token(BaseModel):
     """ повертає сервер з успішного входу"""
