@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, TIMESTAMP, Enum, Text, ForeignKey, text
+from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP, Enum, Text, ForeignKey, text
 from crud.database import Base
 import enum
 
@@ -36,6 +36,18 @@ class Projects(Base):
     status = Column(Enum(ProjectStatus), server_default="active", nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
     owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"),nullable=False)
+
+class ProjectStage(Base):
+    __tablename__ = "project_stages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, ForeignKey("projects.id_project", ondelete="CASCADE"), nullable=False)
+    title = Column(String(100), nullable=False)
+    description = Column(Text, nullable=True)
+    order = Column(Integer, default=0) # Порядок етапу (1-й, 2-й...)
+    is_completed = Column(Boolean, default=False)
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+
 
 class RequestStatus(str, enum.Enum):
     pending = "pending"

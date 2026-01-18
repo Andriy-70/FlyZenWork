@@ -18,6 +18,10 @@ class UserResponse(BaseModel):
     role: str
     is_active: bool
 
+class ChangePassword(BaseModel):
+    old_password: str
+    new_password: str = Field(..., min_length=8)
+
 #схеми для jwt
 class Token(BaseModel):
     """ повертає сервер з успішного входу"""

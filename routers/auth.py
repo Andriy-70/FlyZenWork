@@ -3,10 +3,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from crud.database  import get_db
 from models.models_db import Users
-from utils.security import verify_password, create_access_token
 from schemas import users_schema as us
 from crud import users_db as crud
-from utils.security import get_current_user
+from utils.security import get_current_user, hash_password, verify_password, create_access_token
 
 router = APIRouter(
     prefix="/auth",
@@ -47,3 +46,32 @@ def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = D
 @router.get("/me", response_model=us.UserResponse)
 def read_users_me(current_user: Users = Depends(get_current_user)):
     return current_user
+
+
+@router.post("/change-password", status_code=status.HTTP_200_OK)
+def change_password(
+        pass_data: us.ChangePassword,
+        db: Session = Depends(get_db),
+        current_user: Users = Depends(get_current_user)
+):
+    """ Зміна пароля: перевірка старого + хешування нового """
+
+    # 1. Перевіряємо, чи старий пароль правильний
+    if not verify_password(pass_data.old_password, current_user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Старий пароль введено неправильно"
+        )
+
+    # 2. Перевіряємо, щоб новий пароль не був таким самим, як старий
+    if pass_data.old_password == pass_data.new_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Новий пароль не може співпадати зі старим"
+        )
+
+    # 3. Хешуємо новий пароль і зберігаємо
+    current_user.password_hash = hash_password(pass_data.new_password)
+    db.commit()
+
+    return {"message": "Пароль успішно змінено"}
